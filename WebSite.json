@@ -48,7 +48,7 @@
       "metadata": {
         "description": "The branch of the GitHub repository to use."
       }
-    },
+    }
   },
   "variables": {
     "webSiteName": "[concat('webSite', uniqueString(resourceGroup().id))]",

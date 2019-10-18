@@ -4,115 +4,74 @@
   "parameters": {
     "hostingPlanName": {
       "type": "string",
-      "minLength": 1,
-      "metadata": {
-        "description": "Name of the hosting plan to use in Azure."
-      }
-    },
-    "webSiteName": {
-      "type": "string",
-      "minLength": 1,
-      "metadata": {
-        "description": "Name of the Azure Web app to create."
-      }
+      "minLength": 1
     },
     "skuName": {
       "type": "string",
       "defaultValue": "F1",
       "allowedValues": [
         "F1",
+        "D1",
         "B1",
-        "S1"
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
       ],
       "metadata": {
-        "description": "Describes plan's pricing tier and instance size. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+        "description": "Describes plan's pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
       }
     },
-    "linuxFxVersion": {
-      "type": "string",
-      "defaultValue": "PYTHON|3.7",
+    "skuCapacity": {
+      "type": "int",
+      "defaultValue": 1,
+      "minValue": 1,
       "metadata": {
-        "description": "The Runtime stack of current web app"
+        "description": "Describes plan's instance count"
       }
-    },
-    "repoURL": {
-      "type": "string",
-      "defaultValue": "https://github.com/krassykirov/krFlaskAzureDeploy.git",
-      "metadata": {
-        "description": "The URL for the GitHub repository that contains the project to deploy."
-      }
-    },
-    "branch": {
-      "type": "string",
-      "defaultValue": "master",
-      "metadata": {
-        "description": "The branch of the GitHub repository to use."
-      }
-    },
+    }
   },
   "variables": {
-    "webSiteName": "[concat('webSite', uniqueString(resourceGroup().id))]",
-    "hostingPlanName": "[concat('AppServicePlan-', parameters('webSiteName'))]"
+    "webSiteName": "[concat('webSite', uniqueString(resourceGroup().id))]"
   },
   "resources": [
     {
       "apiVersion": "2015-08-01",
       "name": "[parameters('hostingPlanName')]",
       "type": "Microsoft.Web/serverfarms",
-      "location": "[parameters('location')]",
+      "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "HostingPlan"
       },
       "sku": {
-        "name": "[parameters('skuName')]"
+        "name": "[parameters('skuName')]",
+        "capacity": "[parameters('skuCapacity')]"
       },
-      "kind": "linux",
       "properties": {
-        "reserved": true
+        "name": "[parameters('hostingPlanName')]"
       }
     },
     {
       "apiVersion": "2015-08-01",
-      "name": "[parameters('webSiteName')]",
+      "name": "[variables('webSiteName')]",
       "type": "Microsoft.Web/sites",
-      "location": "[parameters('location')]",
+      "location": "[resourceGroup().location]",
       "tags": {
         "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]": "Resource",
         "displayName": "Website"
       },
       "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]"
+        "[resourceId('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]"
       ],
       "properties": {
-        "name": "[parameters('webSiteName')]",
+        "name": "[variables('webSiteName')]",
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
-      },
-      "resources": [
-        {
-          "apiVersion": "2015-08-01",
-          "dependsOn": [
-            "[concat('Microsoft.Web/sites/', parameters('webSiteName'))]"
-          ],
-          "name": "web",
-          "properties": {
-            "linuxFxVersion": "[parameters('linuxFxVersion')]"
-          },
-          "type": "config"
-        },
-        {
-          "apiVersion": "2015-08-01",
-          "dependsOn": [
-            "[concat('Microsoft.Web/sites/', parameters('webSiteName'))]"
-          ],
-          "name": "web",
-          "properties": {
-            "branch": "[parameters('branch')]",
-            "IsManualIntegration": true,
-            "RepoUrl": "[parameters('repoURL')]"
-          },
-          "type": "sourcecontrols"
-        }
-      ]
+      }
     }
   ]
 }

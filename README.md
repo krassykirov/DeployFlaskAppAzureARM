@@ -1,4 +1,3 @@
-[![Deploy to Azure](https://azuredeploy.net/deploybutton.png)](https://azuredeploy.net/)
-<a href="https://azuredeploy.net/" target="_blank">
+<a href="https://azuredeploy.net/?repository=https://github.com/krassykirov/DeployFlaskAppAzureARM" target="_blank">
     <img src="https://azuredeploy.net/deploybutton.png"/>
 </a>

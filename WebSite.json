@@ -49,13 +49,10 @@
         "description": "The branch of the GitHub repository to use."
       }
     },
-    "location": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().location]",
-      "metadata": {
-        "description": "Location for all resources."
-      }
-    }
+  },
+  "variables": {
+    "webSiteName": "[concat('webSite', uniqueString(resourceGroup().id))]",
+    "hostingPlanName": "[concat('AppServicePlan-', parameters('webSiteName'))]"
   },
   "resources": [
     {
@@ -99,7 +96,7 @@
           "name": "web",
           "properties": {
             "linuxFxVersion": "[parameters('linuxFxVersion')]"
-             },
+          },
           "type": "config"
         },
         {

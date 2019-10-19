@@ -27,92 +27,75 @@
       "metadata": {
         "description": "Describes plan's pricing tier and instance size. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
       }
-    },
-    "linuxFxVersion": {
-      "type": "string",
-      "defaultValue": "PYTHON|3.7",
-      "metadata": {
-        "description": "The Runtime stack of current web app"
-      }
-    },
-    "repoURL": {
-      "type": "string",
-      "defaultValue": "https://github.com/krassykirov/krFlaskAzureDeploy.git",
-      "metadata": {
-        "description": "The URL for the GitHub repository that contains the project to deploy."
-      }
-    },
-    "branch": {
-      "type": "string",
-      "defaultValue": "master",
-      "metadata": {
-        "description": "The branch of the GitHub repository to use."
-      }
     }
   },
   "variables": {
     "webSiteName": "[concat('webSite', uniqueString(resourceGroup().id))]",
-    "hostingPlanName": "[concat('AppServicePlan-', parameters('webSiteName'))]"
+    "hostingPlanName": "[concat('AppServicePlan-', parameters('webSiteName'))]",
+    "repoURL": "https://github.com/krassykirov/krFlaskAzureDeploy.git",
+    "branch": "master",
+    "linuxFxVersion": "PYTHON|3.7"
+
   },
-  "resources": [
-    {
-      "apiVersion": "2015-08-01",
-      "kind": "linux",
-      "location": "[resourceGroup().location]",
-      "name": "[parameters('hostingPlanName')]",
-      "properties": {
-        "reserved": true
-      },
-      "sku": {
-        "name": "[parameters('skuName')]"
-      },
-      "tags": {
-        "displayName": "HostingPlan"
-      },
-      "type": "Microsoft.Web/serverfarms"
-    },
-    {
-      "apiVersion": "2015-08-01",
-      "name": "[parameters('webSiteName')]",
-      "type": "Microsoft.Web/sites",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]": "Resource",
-        "displayName": "Website"
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]"
-      ],
-      "properties": {
-        "name": "[parameters('webSiteName')]",
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
-      },
-      "resources": [
-        {
-          "apiVersion": "2015-08-01",
-          "dependsOn": [
-            "[concat('Microsoft.Web/sites/', parameters('webSiteName'))]"
-          ],
-          "name": "web",
-          "properties": {
-            "linuxFxVersion": "[parameters('linuxFxVersion')]"
-          },
-          "type": "config"
+    "resources": [
+      {
+        "apiVersion": "2015-08-01",
+        "kind": "linux",
+        "location": "[resourceGroup().location]",
+        "name": "[parameters('hostingPlanName')]",
+        "properties": {
+          "reserved": true
         },
-        {
-          "apiVersion": "2015-08-01",
-          "dependsOn": [
-            "[concat('Microsoft.Web/sites/', parameters('webSiteName'))]"
-          ],
-          "name": "web",
-          "properties": {
-            "branch": "[parameters('branch')]",
-            "IsManualIntegration": true,
-            "RepoUrl": "[parameters('repoURL')]"
+        "sku": {
+          "name": "[parameters('skuName')]"
+        },
+        "tags": {
+          "displayName": "HostingPlan"
+        },
+        "type": "Microsoft.Web/serverfarms"
+      },
+      {
+        "apiVersion": "2015-08-01",
+        "name": "[parameters('webSiteName')]",
+        "type": "Microsoft.Web/sites",
+        "location": "[resourceGroup().location]",
+        "tags": {
+          "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]": "Resource",
+          "displayName": "Website"
+        },
+        "dependsOn": [
+          "[concat('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]"
+        ],
+        "properties": {
+          "name": "[parameters('webSiteName')]",
+          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
+        },
+        "resources": [
+          {
+            "apiVersion": "2015-08-01",
+            "dependsOn": [
+              "[concat('Microsoft.Web/sites/', parameters('webSiteName'))]"
+            ],
+            "name": "web",
+            "properties": {
+              "linuxFxVersion": "[variables('linuxFxVersion')]"
+            },
+            "type": "config"
           },
-          "type": "sourcecontrols"
-        }
-      ]
-    }
-  ]
-}
+          {
+            "apiVersion": "2015-08-01",
+            "dependsOn": [
+              "[concat('Microsoft.Web/sites/', parameters('webSiteName'))]"
+            ],
+            "name": "web",
+            "properties": {
+              "branch": "[variables('branch')]",
+              "IsManualIntegration": true,
+              "RepoUrl": "[variables('repoURL')]"
+            },
+            "type": "sourcecontrols"
+          }
+        ]
+      }
+    ]
+  }

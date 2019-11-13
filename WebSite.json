@@ -32,7 +32,7 @@
   "variables": {
     "webSiteName": "[concat('webSite', uniqueString(resourceGroup().id))]",
     "hostingPlanName": "[concat('AppServicePlan-', parameters('webSiteName'))]",
-    "repoURL": "https://github.com/krassykirov/krFlaskAzureDeploy.git",
+    "repoURL": "https://krassykirov@bitbucket.org/krassykirov/azure.git",
     "branch": "master",
     "linuxFxVersion": "PYTHON|3.7"
 
